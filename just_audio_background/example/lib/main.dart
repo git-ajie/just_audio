@@ -10,7 +10,10 @@ Future<void> main() async {
   await JustAudioBackground.init(
     androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
     androidNotificationChannelName: 'Audio playback',
-    androidNotificationOngoing: true,
+    androidNotificationOngoing: false,
+    androidShowNotificationBadge: false,
+    androidNotificationClickStartsActivity: false,
+    androidStopForegroundOnPause: false,
   );
   runApp(const MyApp());
 }
@@ -29,25 +32,21 @@ class MyAppState extends State<MyApp> {
     ClippingAudioSource(
       start: const Duration(seconds: 60),
       end: const Duration(seconds: 90),
-      child: AudioSource.uri(Uri.parse(
-          "https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3")),
+      child: AudioSource.uri(Uri.parse("https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3")),
       tag: MediaItem(
         id: '${_nextMediaId++}',
         album: "Science Friday",
         title: "A Salute To Head-Scratching Science (30 seconds)",
-        artUri: Uri.parse(
-            "https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg"),
+        artUri: Uri.parse("https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg"),
       ),
     ),
     AudioSource.uri(
-      Uri.parse(
-          "https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3"),
+      Uri.parse("https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3"),
       tag: MediaItem(
         id: '${_nextMediaId++}',
         album: "Science Friday",
         title: "A Salute To Head-Scratching Science",
-        artUri: Uri.parse(
-            "https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg"),
+        artUri: Uri.parse("https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg"),
       ),
     ),
     AudioSource.uri(
@@ -56,8 +55,7 @@ class MyAppState extends State<MyApp> {
         id: '${_nextMediaId++}',
         album: "Science Friday",
         title: "From Cat Rheology To Operatic Incompetence",
-        artUri: Uri.parse(
-            "https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg"),
+        artUri: Uri.parse("https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg"),
       ),
     ),
     AudioSource.uri(
@@ -66,8 +64,7 @@ class MyAppState extends State<MyApp> {
         id: '${_nextMediaId++}',
         album: "Public Domain",
         title: "Nature Sounds",
-        artUri: Uri.parse(
-            "https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg"),
+        artUri: Uri.parse("https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg"),
       ),
     ),
   ]);
@@ -87,8 +84,7 @@ class MyAppState extends State<MyApp> {
     final session = await AudioSession.instance;
     await session.configure(const AudioSessionConfiguration.speech());
     // Listen to errors during playback.
-    _player.playbackEventStream.listen((event) {},
-        onError: (Object e, StackTrace stackTrace) {
+    _player.playbackEventStream.listen((event) {}, onError: (Object e, StackTrace stackTrace) {
       print('A stream error occurred: $e');
     });
     try {
@@ -106,13 +102,11 @@ class MyAppState extends State<MyApp> {
     super.dispose();
   }
 
-  Stream<PositionData> get _positionDataStream =>
-      Rx.combineLatest3<Duration, Duration, Duration?, PositionData>(
-          _player.positionStream,
-          _player.bufferedPositionStream,
-          _player.durationStream,
-          (position, bufferedPosition, duration) => PositionData(
-              position, bufferedPosition, duration ?? Duration.zero));
+  Stream<PositionData> get _positionDataStream => Rx.combineLatest3<Duration, Duration, Duration?, PositionData>(
+      _player.positionStream,
+      _player.bufferedPositionStream,
+      _player.durationStream,
+      (position, bufferedPosition, duration) => PositionData(position, bufferedPosition, duration ?? Duration.zero));
 
   @override
   Widget build(BuildContext context) {
@@ -139,13 +133,10 @@ class MyAppState extends State<MyApp> {
                         Expanded(
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Center(
-                                child:
-                                    Image.network(metadata.artUri.toString())),
+                            child: Center(child: Image.network(metadata.artUri.toString())),
                           ),
                         ),
-                        Text(metadata.album!,
-                            style: Theme.of(context).textTheme.titleLarge),
+                        Text(metadata.album!, style: Theme.of(context).textTheme.titleLarge),
                         Text(metadata.title),
                       ],
                     );
@@ -160,8 +151,7 @@ class MyAppState extends State<MyApp> {
                   return SeekBar(
                     duration: positionData?.duration ?? Duration.zero,
                     position: positionData?.position ?? Duration.zero,
-                    bufferedPosition:
-                        positionData?.bufferedPosition ?? Duration.zero,
+                    bufferedPosition: positionData?.bufferedPosition ?? Duration.zero,
                     onChangeEnd: (newPosition) {
                       _player.seek(newPosition);
                     },
@@ -189,9 +179,7 @@ class MyAppState extends State<MyApp> {
                       return IconButton(
                         icon: icons[index],
                         onPressed: () {
-                          _player.setLoopMode(cycleModes[
-                              (cycleModes.indexOf(loopMode) + 1) %
-                                  cycleModes.length]);
+                          _player.setLoopMode(cycleModes[(cycleModes.indexOf(loopMode) + 1) % cycleModes.length]);
                         },
                       );
                     },
@@ -251,9 +239,7 @@ class MyAppState extends State<MyApp> {
                               _playlist.removeAt(i);
                             },
                             child: Material(
-                              color: i == state!.currentIndex
-                                  ? Colors.grey.shade300
-                                  : null,
+                              color: i == state!.currentIndex ? Colors.grey.shade300 : null,
                               child: ListTile(
                                 title: Text(sequence[i].tag.title as String),
                                 onTap: () {
@@ -279,8 +265,7 @@ class MyAppState extends State<MyApp> {
                 id: '${_nextMediaId++}',
                 album: "Public Domain",
                 title: "Nature Sounds ${++_addedCount}",
-                artUri: Uri.parse(
-                    "https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg"),
+                artUri: Uri.parse("https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg"),
               ),
             ));
           },
@@ -327,8 +312,7 @@ class ControlButtons extends StatelessWidget {
             final playerState = snapshot.data;
             final processingState = playerState?.processingState;
             final playing = playerState?.playing;
-            if (processingState == ProcessingState.loading ||
-                processingState == ProcessingState.buffering) {
+            if (processingState == ProcessingState.loading || processingState == ProcessingState.buffering) {
               return Container(
                 margin: const EdgeInsets.all(8.0),
                 width: 64.0,
@@ -351,8 +335,7 @@ class ControlButtons extends StatelessWidget {
               return IconButton(
                 icon: const Icon(Icons.replay),
                 iconSize: 64.0,
-                onPressed: () => player.seek(Duration.zero,
-                    index: player.effectiveIndices!.first),
+                onPressed: () => player.seek(Duration.zero, index: player.effectiveIndices!.first),
               );
             }
           },
@@ -367,8 +350,7 @@ class ControlButtons extends StatelessWidget {
         StreamBuilder<double>(
           stream: player.speedStream,
           builder: (context, snapshot) => IconButton(
-            icon: Text("${snapshot.data?.toStringAsFixed(1)}x",
-                style: const TextStyle(fontWeight: FontWeight.bold)),
+            icon: Text("${snapshot.data?.toStringAsFixed(1)}x", style: const TextStyle(fontWeight: FontWeight.bold)),
             onPressed: () {
               showSliderDialog(
                 context: context,
