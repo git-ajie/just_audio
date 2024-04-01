@@ -717,8 +717,7 @@ class _PlayerAudioHandler extends BaseAudioHandler
     }
     _updatePosition();
     _playing = false;
-    _broadcastState();
-    // TODO: We should really stop listening to events here to mimic
+        // TODO: We should really stop listening to events here to mimic
     // just_audio's behaviour. E.g. if stop() was called, we actually want to
     // keep the state around even though the platform may be disposing its own
     // state.
@@ -726,6 +725,7 @@ class _PlayerAudioHandler extends BaseAudioHandler
     _justAudioEvent = _justAudioEvent.copyWith(
       processingState: ProcessingStateMessage.idle,
     );
+    _broadcastState();
   }
 
   Duration get currentPosition {
